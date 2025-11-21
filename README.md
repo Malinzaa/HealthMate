@@ -35,4 +35,3 @@ HealthMate is a flutter-based mobile application developed for tracking user's d
 - ![View all records](UI_screenshots/viewRecords.png)
 - ![Edit records](UI_screenshots/editRecord.png)
 
-
