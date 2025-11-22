@@ -39,6 +39,7 @@ class HealthRecordProvider with ChangeNotifier {
   }
   // Load latest record
   Future<void> loadLatestRecord() async {
+    _records = await dbHelper.getAllRecords();
     await _updateLatestRecord();
     notifyListeners();
   }

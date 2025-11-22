@@ -127,7 +127,7 @@ class _DashboardState extends State<Dashboard> {
                   child: Text(
                     "Today's Health Overview...",
                     style: TextStyle(
-                      fontSize: 28,
+                      fontSize: MediaQuery.of(context).size.width * 0.065,
                       fontFamily: 'Lato',
                       fontWeight: FontWeight.w800,
                       color: Colors.brown,
@@ -136,38 +136,35 @@ class _DashboardState extends State<Dashboard> {
                 ),
                 SizedBox(height: 20),
 
-                Expanded(
-                  child: GridView.count(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 26,
-                    childAspectRatio: MediaQuery.of(context).size.width /
-                        (MediaQuery.of(context).size.height / 1.9),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.47,
+                  child: GridView(
+                    physics: NeverScrollableScrollPhysics(),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 16,
+                      mainAxisSpacing: 16,
+                      childAspectRatio: 0.85,
+                    ),
                     children: [
-                      _buildMetricCard("Steps Today",
-                          healthData.steps.toString(), Color(0xFF4CAF50), "assets/steps.png"),
-                      _buildMetricCard("Energy Burn",
-                          "${healthData.calories} kcal", Color(0xFFD65831), "assets/cals.png"),
-                      _buildMetricCard("Water Intake",
-                          "${healthData.waterLevel} ml", Color(0xFF4A90E2), "assets/water.png"),
-                      _buildMetricCard("Sleep Hours",
-                          "${healthData.sleepHours} hrs", Color(0xFF9F4EAD), "assets/sleep.png"),
+                      _buildMetricCard("Steps Today", healthData.steps.toString(), Color(0xFF4CAF50), "assets/steps.png"),
+                      _buildMetricCard("Energy Burn", "${healthData.calories} kcal", Color(0xFFD65831), "assets/cals.png"),
+                      _buildMetricCard("Water Intake", "${healthData.waterLevel} ml", Color(0xFF4A90E2), "assets/water.png"),
+                      _buildMetricCard("Sleep Hours", "${healthData.sleepHours} hrs", Color(0xFF9F4EAD), "assets/sleep.png"),
                     ],
                   ),
                 ),
 
-                SizedBox(height: 20),
+                SizedBox(height: 16),
 
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
-                      flex: 1,
                       child: GestureDetector(
                         onTap: _showBMIDialog,
                         child: Container(
-                          height: 220,
-                          padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                          padding: EdgeInsets.all(50),
                           decoration: BoxDecoration(
                             color: Colors.blueGrey,
                             borderRadius: BorderRadius.circular(10),
@@ -182,32 +179,34 @@ class _DashboardState extends State<Dashboard> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Image.asset(
-                                "assets/bmi.png",
-                                width: 40,
-                                height: 40,
-                              ),
+                              Image.asset("assets/bmi.png", width: 40, height: 40),
                               SizedBox(height: 12),
-                              Text(
-                                "BMI",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 24,
-                                  color: Colors.white,
+                              FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  "BMI",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 24,
+                                    color: Colors.white,
+                                  ),
+                                  textAlign: TextAlign.center,
                                 ),
-                                textAlign: TextAlign.center,
                               ),
                               SizedBox(height: 5),
-                              Text(
-                                healthData.bmi == null
-                                    ? "Tap to calculate"
-                                    : "${healthData.bmi} (${healthData.bmiStatus})",
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                              FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  healthData.bmi == null
+                                      ? "Tap to calculate"
+                                      : "${healthData.bmi} (${healthData.bmiStatus})",
+                                  style: TextStyle(
+                                    fontSize: 28,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                  textAlign: TextAlign.center,
                                 ),
-                                textAlign: TextAlign.center,
                               ),
                             ],
                           ),
@@ -218,11 +217,11 @@ class _DashboardState extends State<Dashboard> {
                     SizedBox(width: 16),
 
                     Expanded(
-                      flex: 1,
                       child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          SizedBox(height: 50),
+                          SizedBox(height: 30),
                           ElevatedButton.icon(
                             onPressed: () async {
                               bool? recordAdded = await Navigator.push(
@@ -232,6 +231,7 @@ class _DashboardState extends State<Dashboard> {
                                 }),
                               );
                               if (recordAdded == true) {
+                                healthData.loadLatestRecord();
                               }
                             },
                             icon: Icon(Icons.add, color: Colors.white, size: 26),
@@ -274,48 +274,65 @@ class _DashboardState extends State<Dashboard> {
   }
 
   Widget _buildMetricCard(String title, String value, Color color, String assetImage) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.symmetric(vertical: 45, horizontal: 16),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
-            blurRadius: 6,
-            offset: Offset(0, 3),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        double imageSize = constraints.maxHeight * 0.25;
+        double titleFontSize = constraints.maxHeight * 0.11;
+        double valueFontSize = constraints.maxHeight * 0.12;
+        double verticalPadding = constraints.maxHeight * 0.15;
+
+        return Container(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(vertical: verticalPadding, horizontal: 16),
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.2),
+                blurRadius: 6,
+                offset: Offset(0, 3),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Image.asset(
-            assetImage,
-            width: 40,
-            height: 40,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(
+                assetImage,
+                width: imageSize,
+                height: imageSize,
+              ),
+              SizedBox(height: verticalPadding * 0.3),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: titleFontSize,
+                    color: Colors.white,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              SizedBox(height: verticalPadding * 0.1),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  value,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: valueFontSize,
+                    color: Colors.white,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
           ),
-          SizedBox(height: 12),
-          Text(
-            title,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 24,
-              color: Colors.white,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          SizedBox(height: 5),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
