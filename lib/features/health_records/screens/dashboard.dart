@@ -87,30 +87,44 @@ class _DashboardState extends State<Dashboard> {
         preferredSize: Size.fromHeight(80),
         child: AppBar(
           elevation: 2,
-          flexibleSpace: Stack(
-            children: [
-              Positioned(
-                left: 2,
-                top: 26,
-                child: Container(
-                  width: 130,
-                  height: 130,
-                  child: Image.asset(
-                    'assets/logo.png',
-                    fit: BoxFit.contain,
+          flexibleSpace: LayoutBuilder(
+            builder: (context, constraints) {
+              double screenWidth = MediaQuery.of(context).size.width;
+              double scale = screenWidth / 420;
+
+              return Stack(
+                children: [
+                  Positioned(
+                    left: 1 * scale,
+                    top: 20 * scale,
+                    child: SizedBox(
+                      width: 130 * scale,
+                      height: 130 * scale,
+                      child: Image.asset(
+                        'assets/logo.png',
+                        fit: BoxFit.contain,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-            ],
+                ],
+              );
+            },
           ),
-          title: Text(
-            "HealthMate",
-            style: TextStyle(
-              fontFamily: 'Nunito',
-              fontSize: 35,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
+          title: LayoutBuilder(
+            builder: (context, constraints) {
+              double screenWidth = MediaQuery.of(context).size.width;
+              double scale = screenWidth / 400;
+
+              return Text(
+                "HealthMate",
+                style: TextStyle(
+                  fontFamily: 'Nunito',
+                  fontSize: 35 * scale,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              );
+            },
           ),
           centerTitle: true,
         ),
@@ -201,7 +215,7 @@ class _DashboardState extends State<Dashboard> {
                                       ? "Tap to calculate"
                                       : "${healthData.bmi} (${healthData.bmiStatus})",
                                   style: TextStyle(
-                                    fontSize: 28,
+                                    fontSize: 50,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
                                   ),
